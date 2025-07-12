@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>75 Day Challenge Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #ffa726);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-container {
+            background: white;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            background: #f0f0f0;
+            border-radius: 25px;
+            height: 30px;
+            overflow: hidden;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            height: 100%;
+            border-radius: 25px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .daily-tracker {
+            margin: 20px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .daily-tracker h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .habits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .habit-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .habit-card.completed {
+            background: #d4edda;
+            border-color: #4CAF50;
+        }
+
+        .habit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .habit-title {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .habit-checkbox {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 3px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .habit-checkbox.checked {
+            background: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .habit-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+        }
+
+        .habit-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .habit-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .notes-section {
+            margin-top: 30px;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .save-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .calendar-view {
+            margin: 20px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            transform: scale(1.05);
+        }
+
+        .calendar-day.completed {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .calendar-day.partial {
+            background: #ff9800;
+            color: white;
+        }
+
+        .calendar-day.current {
+            border: 3px solid #667eea;
+        }
+
+        .reset-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .share-section {
+            margin: 20px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .share-btn {
+            background: linear-gradient(45deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .share-btn.twitter {
+            background: linear-gradient(45deg, #1DA1F2, #0d8bd9);
+        }
+
+        .share-btn.linkedin {
+            background: linear-gradient(45deg, #0077B5, #005582);
+        }
+
+        .progress-summary {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .achievement-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin: 5px;
+            font-weight: bold;
+        }
+
+        .social-proof {
+            margin: 20px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .accountability-partners {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .partner-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .partner-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .habits-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calendar-grid {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 75 Day Challenge</h1>
+            <p>Transform Your Life in 75 Days</p>
+        </div>
+
+        <div class="progress-container">
+            <h3>Overall Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p id="progressText">Day 1 of 75</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="currentDay">1</div>
+                <div>Current Day</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedDays">0</div>
+                <div>Completed Days</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="remainingDays">75</div>
+                <div>Days Remaining</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="streakCount">0</div>
+                <div>Current Streak</div>
+            </div>
+        </div>
+
+        <div class="daily-tracker">
+            <h2>📅 Today's Habits</h2>
+            <div class="habits-grid">
+                <div class="habit-card" data-habit="workout">
+                    <div class="habit-header">
+                        <span class="habit-title">🏋️ Physical Exercise</span>
+                        <div class="habit-checkbox" onclick="toggleHabit('workout')"></div>
+                    </div>
+                    <input type="text" class="habit-input" placeholder="e.g., 45 min gym workout" id="workout-input">
+                </div>
+
+                <div class="habit-card" data-habit="diet">
+                    <div class="habit-header">
+                        <span class="habit-title">🥗 Follow Diet</span>
+                        <div class="habit-checkbox" onclick="toggleHabit('diet')"></div>
+                    </div>
+                    <input type="text" class="habit-input" placeholder="e.g., No junk food, 8 glasses water" id="diet-input">
+                </div>
+
+                <div class="habit-card" data-habit="water">
+                    <div class="habit-header">
+                        <span class="habit-title">💧 Water Intake</span>
+                        <div class="habit-checkbox" onclick="toggleHabit('water')"></div>
+                    </div>
+                    <input type="text" class="habit-input" placeholder="e.g., 3 liters of water" id="water-input">
+                </div>
+
+                <div class="habit-card" data-habit="reading">
+                    <div class="habit-header">
+                        <span class="habit-title">📚 Reading</span>
+                        <div class="habit-checkbox" onclick="toggleHabit('reading')"></div>
+                    </div>
+                    <input type="text" class="habit-input" placeholder="e.g., 30 pages of self-help book" id="reading-input">
+                </div>
+
+                <div class="habit-card" data-habit="meditation">
+                    <div class="habit-header">
+                        <span class="habit-title">🧘 Meditation/Prayer</span>
+                        <div class="habit-checkbox" onclick="toggleHabit('meditation')"></div>
+                    </div>
+                    <input type="text" class="habit-input" placeholder="e.g., 20 min meditation" id="meditation-input">
+                </div>
+
+                <div class="habit-card" data-habit="noSocial">
+                    <div class="habit-header">
+                        <span class="habit-title">📱 No Social Media</span>
+                        <div class="habit-checkbox" onclick="toggleHabit('noSocial')"></div>
+                    </div>
+                    <input type="text" class="habit-input" placeholder="e.g., Only 30 min allowed" id="noSocial-input">
+                </div>
+            </div>
+
+            <div class="notes-section">
+                <h3>📝 Daily Reflection</h3>
+                <textarea class="notes-textarea" id="dailyNotes" placeholder="How did today go? What challenges did you face? What are you grateful for?"></textarea>
+            </div>
+
+            <button class="save-btn" onclick="saveDay()">💾 Save Today's Progress</button>
+            <button class="reset-btn" onclick="resetChallenge()">🔄 Reset Challenge</button>
+        </div>
+
+        <div class="share-section">
+            <h2>🤝 Share Your Progress</h2>
+            <div class="progress-summary" id="progressSummary">
+                <h3>Today's Achievement</h3>
+                <p id="summaryText">Ready to start your journey!</p>
+                <div id="achievementBadges"></div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <button class="share-btn" onclick="shareProgress('whatsapp')">📱 Share on WhatsApp</button>
+                <button class="share-btn twitter" onclick="shareProgress('twitter')">🐦 Share on Twitter</button>
+                <button class="share-btn linkedin" onclick="shareProgress('linkedin')">💼 Share on LinkedIn</button>
+            </div>
+            
+            <button class="save-btn" onclick="copyShareText()">📋 Copy Share Text</button>
+        </div>
+
+        <div class="social-proof">
+            <h2>👥 Accountability Partners</h2>
+            <p>Add friends/family who will help keep you accountable!</p>
+            <div class="accountability-partners" id="partnersGrid">
+                <div class="partner-card">
+                    <input type="text" class="partner-input" placeholder="Partner Name" id="partner1Name">
+                    <input type="text" class="partner-input" placeholder="Contact/Social" id="partner1Contact">
+                </div>
+                <div class="partner-card">
+                    <input type="text" class="partner-input" placeholder="Partner Name" id="partner2Name">
+                    <input type="text" class="partner-input" placeholder="Contact/Social" id="partner2Contact">
+                </div>
+            </div>
+            <button class="save-btn" onclick="savePartners()">💾 Save Partners</button>
+        </div>
+
+        <div class="calendar-view">
+            <h2>📅 75 Day Calendar</h2>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data structure
+        let challengeData = {
+            startDate: new Date().toDateString(),
+            currentDay: 1,
+            days: {}
+        };
+
+        // Load saved data
+        function loadData() {
+            const saved = localStorage.getItem('75DayChallenge');
+            if (saved) {
+                challengeData = JSON.parse(saved);
+                updateDisplay();
+                loadTodaysData();
+            }
+            generateCalendar();
+        }
+
+        // Save data
+        function saveData() {
+            localStorage.setItem('75DayChallenge', JSON.stringify(challengeData));
+        }
+
+        // Toggle habit completion
+        function toggleHabit(habitName) {
+            const checkbox = document.querySelector(`[data-habit="${habitName}"] .habit-checkbox`);
+            const card = document.querySelector(`[data-habit="${habitName}"]`);
+            
+            checkbox.classList.toggle('checked');
+            card.classList.toggle('completed');
+        }
+
+        // Save today's progress
+        function saveDay() {
+            const today = new Date().toDateString();
+            const dayData = {
+                habits: {},
+                notes: document.getElementById('dailyNotes').value,
+                date: today
+            };
+
+            // Save habit data
+            const habits = ['workout', 'diet', 'water', 'reading', 'meditation', 'noSocial'];
+            habits.forEach(habit => {
+                const checkbox = document.querySelector(`[data-habit="${habit}"] .habit-checkbox`);
+                const input = document.getElementById(`${habit}-input`);
+                dayData.habits[habit] = {
+                    completed: checkbox.classList.contains('checked'),
+                    details: input.value
+                };
+            });
+
+            challengeData.days[today] = dayData;
+            
+            // Calculate completion percentage
+            const completedHabits = Object.values(dayData.habits).filter(h => h.completed).length;
+            const totalHabits = Object.keys(dayData.habits).length;
+            dayData.completionPercentage = (completedHabits / totalHabits) * 100;
+
+            saveData();
+            updateDisplay();
+            updateProgressSummary();
+            generateCalendar();
+            
+            // Show success message
+            alert('Day saved successfully! Keep going! 🚀');
+        }
+
+        // Load today's data
+        function loadTodaysData() {
+            const today = new Date().toDateString();
+            const dayData = challengeData.days[today];
+            
+            if (dayData) {
+                // Load habits
+                Object.entries(dayData.habits).forEach(([habit, data]) => {
+                    const checkbox = document.querySelector(`[data-habit="${habit}"] .habit-checkbox`);
+                    const input = document.getElementById(`${habit}-input`);
+                    const card = document.querySelector(`[data-habit="${habit}"]`);
+                    
+                    if (data.completed) {
+                        checkbox.classList.add('checked');
+                        card.classList.add('completed');
+                    }
+                    input.value = data.details || '';
+                });
+                
+                // Load notes
+                document.getElementById('dailyNotes').value = dayData.notes || '';
+            }
+        }
+
+        // Update display
+        function updateDisplay() {
+            const startDate = new Date(challengeData.startDate);
+            const today = new Date();
+            const daysDiff = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            
+            challengeData.currentDay = Math.max(1, Math.min(daysDiff, 75));
+            
+            const completedDays = Object.keys(challengeData.days).length;
+            const remainingDays = 75 - challengeData.currentDay + 1;
+            const progress = (challengeData.currentDay / 75) * 100;
+            
+            document.getElementById('currentDay').textContent = challengeData.currentDay;
+            document.getElementById('completedDays').textContent = completedDays;
+            document.getElementById('remainingDays').textContent = Math.max(0, remainingDays);
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `Day ${challengeData.currentDay} of 75`;
+            
+            // Calculate streak
+            const streak = calculateStreak();
+            document.getElementById('streakCount').textContent = streak;
+        }
+
+        // Calculate current streak
+        function calculateStreak() {
+            const sortedDays = Object.keys(challengeData.days).sort((a, b) => new Date(b) - new Date(a));
+            let streak = 0;
+            
+            for (let day of sortedDays) {
+                const dayData = challengeData.days[day];
+                const completedHabits = Object.values(dayData.habits).filter(h => h.completed).length;
+                if (completedHabits >= 4) { // At least 4 habits completed
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+        // Generate calendar
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+            
+            const startDate = new Date(challengeData.startDate);
+            const today = new Date();
+            
+            for (let i = 1; i <= 75; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day';
+                dayDiv.textContent = i;
+                
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i - 1);
+                const dateString = currentDate.toDateString();
+                
+                if (challengeData.days[dateString]) {
+                    const dayData = challengeData.days[dateString];
+                    if (dayData.completionPercentage === 100) {
+                        dayDiv.classList.add('completed');
+                    } else if (dayData.completionPercentage > 0) {
+                        dayDiv.classList.add('partial');
+                    }
+                }
+                
+                if (i === challengeData.currentDay) {
+                    dayDiv.classList.add('current');
+                }
+                
+                calendarGrid.appendChild(dayDiv);
+            }
+        }
+
+        // Generate share text
+        function generateShareText() {
+            const today = new Date().toDateString();
+            const dayData = challengeData.days[today];
+            const completedHabits = dayData ? Object.values(dayData.habits).filter(h => h.completed).length : 0;
+            const totalHabits = 6;
+            
+            let shareText = `🏆 75 Day Challenge - Day ${challengeData.currentDay}/75\n\n`;
+            shareText += `✅ Completed ${completedHabits}/${totalHabits} habits today\n`;
+            shareText += `🔥 Current streak: ${calculateStreak()} days\n`;
+            shareText += `📈 Progress: ${Math.round((challengeData.currentDay / 75) * 100)}%\n\n`;
+            
+            if (dayData) {
+                shareText += `Today's Habits:\n`;
+                const habitNames = {
+                    workout: '🏋️ Exercise',
+                    diet: '🥗 Diet',
+                    water: '💧 Water',
+                    reading: '📚 Reading',
+                    meditation: '🧘 Meditation',
+                    noSocial: '📱 No Social Media'
+                };
+                
+                Object.entries(dayData.habits).forEach(([habit, data]) => {
+                    const status = data.completed ? '✅' : '❌';
+                    shareText += `${status} ${habitNames[habit]}\n`;
+                });
+            }
+            
+            shareText += `\n💪 Transforming myself one day at a time!\n`;
+            shareText += `#75DayChallenge #Transformation #Accountability`;
+            
+            return shareText;
+        }
+
+        // Share progress on different platforms
+        function shareProgress(platform) {
+            const text = generateShareText();
+            const encodedText = encodeURIComponent(text);
+            
+            let url;
+            switch(platform) {
+                case 'whatsapp':
+                    url = `https://wa.me/?text=${encodedText}`;
+                    break;
+                case 'twitter':
+                    url = `https://twitter.com/intent/tweet?text=${encodedText}`;
+                    break;
+                case 'linkedin':
+                    url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedText}`;
+                    break;
+            }
+            
+            window.open(url, '_blank');
+        }
+
+        // Copy share text to clipboard
+        function copyShareText() {
+            const text = generateShareText();
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Share text copied to clipboard! 📋');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Share text copied to clipboard! 📋');
+            });
+        }
+
+        // Update progress summary
+        function updateProgressSummary() {
+            const today = new Date().toDateString();
+            const dayData = challengeData.days[today];
+            const summaryText = document.getElementById('summaryText');
+            const achievementBadges = document.getElementById('achievementBadges');
+            
+            if (dayData) {
+                const completedHabits = Object.values(dayData.habits).filter(h => h.completed).length;
+                const totalHabits = Object.keys(dayData.habits).length;
+                
+                summaryText.innerHTML = `
+                    <strong>Day ${challengeData.currentDay}</strong><br>
+                    Completed ${completedHabits}/${totalHabits} habits today<br>
+                    <em>"${dayData.notes || 'No reflection added yet'}"</em>
+                `;
+                
+                // Add achievement badges
+                let badges = '';
+                if (completedHabits === totalHabits) badges += '<span class="achievement-badge">🏆 Perfect Day!</span>';
+                if (calculateStreak() >= 7) badges += '<span class="achievement-badge">🔥 Week Streak!</span>';
+                if (challengeData.currentDay >= 25) badges += '<span class="achievement-badge">🎯 Quarter Way!</span>';
+                if (challengeData.currentDay >= 50) badges += '<span class="achievement-badge">⭐ Halfway Hero!</span>';
+                
+                achievementBadges.innerHTML = badges;
+            } else {
+                summaryText.innerHTML = `<strong>Day ${challengeData.currentDay}</strong><br>Ready to crush today's habits!`;
+                achievementBadges.innerHTML = '';
+            }
+        }
+
+        // Save accountability partners
+        function savePartners() {
+            const partners = [];
+            for (let i = 1; i <= 2; i++) {
+                const name = document.getElementById(`partner${i}Name`).value;
+                const contact = document.getElementById(`partner${i}Contact`).value;
+                if (name || contact) {
+                    partners.push({ name, contact });
+                }
+            }
+            
+            challengeData.accountabilityPartners = partners;
+            saveData();
+            alert('Accountability partners saved! 👥');
+        }
+
+        // Load accountability partners
+        function loadPartners() {
+            if (challengeData.accountabilityPartners) {
+                challengeData.accountabilityPartners.forEach((partner, index) => {
+                    if (index < 2) {
+                        document.getElementById(`partner${index + 1}Name`).value = partner.name || '';
+                        document.getElementById(`partner${index + 1}Contact`).value = partner.contact || '';
+                    }
+                });
+            }
+        }
+        function resetChallenge() {
+            if (confirm('Are you sure you want to reset your entire challenge? This cannot be undone!')) {
+                challengeData = {
+                    startDate: new Date().toDateString(),
+                    currentDay: 1,
+                    days: {}
+                };
+                
+                // Clear form
+                document.querySelectorAll('.habit-checkbox').forEach(cb => cb.classList.remove('checked'));
+                document.querySelectorAll('.habit-card').forEach(card => card.classList.remove('completed'));
+                document.querySelectorAll('.habit-input').forEach(input => input.value = '');
+                document.getElementById('dailyNotes').value = '';
+                
+                saveData();
+                updateDisplay();
+                generateCalendar();
+                
+                alert('Challenge reset successfully! Ready for a fresh start! 💪');
+            }
+        }
+
+        // Initialize app
+        loadData();
+        updateDisplay();
+        updateProgressSummary();
+        loadPartners();
+    </script>
+</body>
+</html>
